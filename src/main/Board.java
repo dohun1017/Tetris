@@ -91,6 +91,8 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 	
 	private int score = 0;
 	
+	private int nextIndex[] = {(int)(Math.random()*shapes.length),(int)(Math.random()*shapes.length)};
+	
 	
 	public Board(){
 		// load Assets
@@ -258,8 +260,12 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 	}
 	
 	public void setNextShape(){
-		int index = (int)(Math.random()*shapes.length);
-		nextShape = new Shape(shapes[index].getCoords(), shapes[index].getBlock(), this, shapes[index].getColor());
+			nextIndex[0] = nextIndex[1];
+			nextIndex[1] = (int)(Math.random()*shapes.length);
+			System.out.println("처음 아님");
+			System.out.println(nextIndex[0]);
+			System.out.println(nextIndex[1]);
+		nextShape = new Shape(shapes[nextIndex[0]].getCoords(), shapes[nextIndex[0]].getBlock(), this, shapes[nextIndex[0]].getColor());
 	}
 	
 	public void setCurrentShape(){
