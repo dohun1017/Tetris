@@ -234,6 +234,7 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 			g.setColor(Color.WHITE);
 			g.setFont(new Font("Georgia", Font.BOLD, 30));
 			g.drawString(gameOverString, 50, Window.HEIGHT/2);
+			System.out.println("Á¾·á");
 		}	
 		g.setColor(Color.WHITE);
 		
