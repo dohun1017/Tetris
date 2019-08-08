@@ -192,7 +192,7 @@ public class Shape {
 //		return temp;
 //	}
 
-//¿ŞÂÊÀ¸·Î È¸Àü
+//ì™¼ìª½ìœ¼ë¡œ íšŒì „
 	private int[][] transposeMatrixLeft(int[][] matrix) {
 		int[][] temp = new int[matrix[0].length][matrix.length];
 		for (int i = 0; i < matrix.length; i++)
@@ -201,7 +201,7 @@ public class Shape {
 		return temp;
 	}
 
-//¿À¸¥ÂÊÀ¸·Î È¸Àü
+//ì˜¤ë¥¸ìª½ìœ¼ë¡œ íšŒì „
 	private int[][] transposeMatrixRight(int[][] matrix) {
 		int[][] temp = new int[matrix[0].length][matrix.length];
 		for (int i = 0; i < matrix.length; i++)
