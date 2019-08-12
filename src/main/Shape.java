@@ -3,6 +3,8 @@ package main;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
+import javax.xml.ws.handler.MessageContext.Scope;
+
 public class Shape {
 
 	private int color;
@@ -21,8 +23,6 @@ public class Shape {
 
 	private int[][] reference;
 
-	private int[][] holdShape;
-	
 	private int deltaX;
 
 	private Board board;
@@ -61,7 +61,6 @@ public class Shape {
 				}
 			}
 			checkLine();
-			board.addScore();
 			board.setCurrentShape();
 		}
 
@@ -108,6 +107,7 @@ public class Shape {
 
 	public void render(Graphics g) {
 
+		// 도형 떨어질때 과정 그림
 		for (int row = 0; row < coords.length; row++) {
 			for (int col = 0; col < coords[0].length; col++) {
 				if (coords[row][col] != 0) {
@@ -115,46 +115,29 @@ public class Shape {
 				}
 			}
 		}
-
-		for (int row = 0; row < reference.length; row++) {
-			for (int col = 0; col < reference[0].length; col++) {
-				if (reference[row][col] != 0) {
-					g.drawImage(block, col * 30 + 320, row * 30 + 160, null);
-				}
-
-			}
-
-		}
-
 	}
 
 	private void checkLine() {
-		int size = board.getBoard().length - 1;
-
-		for (int i = board.getBoard().length - 1; i > 0; i--) {
+		/*
+		 * 세로(20) * 가로(10) 가로 한줄씩 검사 첫 번째 if 해당칸에 블록이 차있으면 count++ 두 번째 if count가 10보다
+		 * 작으면 size-- / count가 10보다 크거나 같으면 size--를 하지 않음 => 몇줄 없앴는지 알 수 있음
+		 * 가로줄이 꽉차있으면 그 위의 줄의 내용을 덮어 씌움
+		 */
+		int size = board.getBoard().length -1;
+		for (int i = board.getBoard().length - 1; i >= 0; i--) {
 			int count = 0;
 			for (int j = 0; j < board.getBoard()[0].length; j++) {
 				if (board.getBoard()[i][j] != 0)
 					count++;
-
 				board.getBoard()[size][j] = board.getBoard()[i][j];
 			}
-			if (count < board.getBoard()[0].length)
+			if (count < board.getBoard()[0].length) {
 				size--;
+			}
 		}
+		if (size >= 0)
+			board.addScore(size+1);
 	}
-	
-//	public void holdShape() {
-//		if(holdShape == null) {
-//			holdShape = coords;
-//			coords = ne
-//		else {
-//			int temp[][] = holdShape;
-//			holdShape = matrix;
-//			matrix = temp;
-//		}
-//		coords = matrix;
-//	}
 
 	public void rotateShape() {
 
@@ -184,14 +167,6 @@ public class Shape {
 		coords = rotatedShape;
 	}
 
-//	private int[][] transposeMatrix(int[][] matrix) {
-//		int[][] temp = new int[matrix[0].length][matrix.length];
-//		for (int i = 0; i < matrix.length; i++)
-//			for (int j = 0; j < matrix[0].length; j++)
-//				temp[j][i] = matrix[i][j];
-//		return temp;
-//	}
-
 //왼쪽으로 회전
 	private int[][] transposeMatrixLeft(int[][] matrix) {
 		int[][] temp = new int[matrix[0].length][matrix.length];
@@ -209,21 +184,6 @@ public class Shape {
 				temp[j][matrix.length - i - 1] = matrix[i][j];
 		return temp;
 	}
-
-//	private int[][] reverseRows(int[][] matrix) {
-//
-//		int middle = matrix.length / 2;
-//
-//		for (int i = 0; i < middle; i++) {
-//			int[] temp = matrix[i];
-//
-//			matrix[i] = matrix[matrix.length - i - 1];
-//			matrix[matrix.length - i - 1] = temp;
-//		}
-//
-//		return matrix;
-//
-//	}
 
 	public int getColor() {
 		return color;
@@ -247,6 +207,10 @@ public class Shape {
 
 	public int[][] getCoords() {
 		return coords;
+	}
+
+	public void setCoords(int[][] coords) {
+		this.coords = coords;
 	}
 
 	public int getX() {
