@@ -49,7 +49,7 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 
 	//필드
 	private int[][] board = new int[boardHeight][boardWidth];
-
+	
 	//모든 도형
 	private Shape[] shapes = new Shape[7];
 

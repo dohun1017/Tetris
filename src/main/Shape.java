@@ -161,7 +161,23 @@ public class Shape {
 		 * 작으면 size-- / count가 10보다 크거나 같으면 size--를 하지 않음 => 몇줄 없앴는지 알 수 있음 가로줄이 꽉차있으면 그
 		 * 위의 줄의 내용을 덮어 씌움
 		 */
-		int size = board.getBoard().length - 1;
+//		//원본
+//		int size = board.getBoard().length - 1;
+//		for (int i = board.getBoard().length - 1; i >= 0; i--) {
+//			int count = 0;
+//			for (int j = 0; j < board.getBoard()[0].length; j++) {
+//				if (board.getBoard()[i][j] != 0)
+//					count++;
+//				board.getBoard()[size][j] = board.getBoard()[i][j];
+//			}
+//			if (count < board.getBoard()[0].length) {
+//				size--;
+//			}
+//		}
+//		if (size >= 0)
+//			board.addScore(size + 1);
+//	}
+		int size = board.getBoard().length -1;
 		for (int i = board.getBoard().length - 1; i >= 0; i--) {
 			int count = 0;
 			for (int j = 0; j < board.getBoard()[0].length; j++) {
@@ -176,7 +192,6 @@ public class Shape {
 		if (size >= 0)
 			board.addScore(size + 1);
 	}
-
 	// 도형 회전 메소드
 	public void rotateShape() {
 
