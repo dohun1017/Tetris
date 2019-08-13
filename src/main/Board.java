@@ -61,7 +61,7 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 
 	private int FPS = 60;
 
-	private int delay = 1000 / FPS;
+	private int delay = 1;
 
 	// mouse events variables
 
@@ -173,17 +173,18 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 		super.paintComponent(g);
 
 		g.drawImage(background, 0, 0, null);
-
 		for (int row = 0; row < board.length; row++) {
 			for (int col = 0; col < board[row].length; col++) {
 
 				if (board[row][col] != 0) {
-					// 블록 쌓는 이미지
+					// 블록 쌓이는 이미지
 					g.drawImage(blocks.getSubimage((board[row][col] - 1) * blockSize, 0, blockSize, blockSize),
 							col * blockSize, row * blockSize, null);
 				}
+
 			}
 		}
+
 		// 다음 도형 첫 번째 그리기
 		for (int row = 0; row < nextShape.getCoords().length; row++) {
 			for (int col = 0; col < nextShape.getCoords()[0].length; col++) {
@@ -209,7 +210,8 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 					}
 				}
 			}
-		currentShape.render(g);
+		if (!gameOver)
+			currentShape.render(g);
 
 		if (stopBounds.contains(mouseX, mouseY))
 			g.drawImage(
@@ -273,26 +275,16 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 		setNextShape();
 		holdPossible = true;
 
-		// 게임오버 원본
-//		for (int row = 0; row < currentShape.getCoords().length; row++) {
-//			for (int col = 0; col < currentShape.getCoords()[0].length; col++) {
-//				if (currentShape.getCoords()[row][col] != 0) {
-//					if (board[currentShape.getY() + row][currentShape.getX() + col] != 0) {
-//						gameOver = true;
-//					}
-//				}
-//			}
-//		}
 		for (int row = 0; row < currentShape.getCoords().length; row++) {
 			for (int col = 0; col < currentShape.getCoords()[0].length; col++) {
 				if (currentShape.getCoords()[row][col] != 0) {
+					// 게임 오버
 					if (board[currentShape.getY() + row][currentShape.getX() + col] != 0) {
 						gameOver = true;
 					}
 				}
 			}
 		}
-
 	}
 
 	public int[][] getBoard() {
@@ -339,7 +331,7 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 		setNextShape();
 		setCurrentShape();
 		holdShape = null;
-		if(gamePaused)
+		if (gamePaused)
 			holdPossible = false;
 		else
 			holdPossible = true;
@@ -376,6 +368,20 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 		}
 		holdPossible = false;
 	}
+
+//	public void quickShape() {
+//		for (int row = 0; row < board.length; row++) {
+//			for (int col = 0; col < board[row].length; col++) {
+//
+//				if (board[row][col] != 0) {
+//					// 블록 떨어지는 이미지
+//					g.drawImage(blocks.getSubimage((board[row][col] - 1) * blockSize, 0, blockSize, blockSize),
+//							col * blockSize, row * blockSize, null);
+//				}
+//
+//			}
+//		}
+//	}
 
 	class GameLooper implements ActionListener {
 
@@ -430,4 +436,11 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 		score += line;
 	}
 
+	public boolean getGameOver() {
+		return gameOver;
+	}
+
+	public int getScore() {
+		return score;
+	}
 }

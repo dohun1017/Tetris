@@ -39,6 +39,13 @@ public class Shape {
 		deltaX = 0;
 		x = 4;
 		y = 0;
+		//속도 난이도 변경
+		if(this.board.getScore() >= 100) 
+			normal = 100;
+		else if(this.board.getScore() >= 110)
+			normal = 70;
+		else
+			normal -= (this.board.getScore() / 10) * 50;
 		delay = normal;
 		time = 0;
 		lastTime = System.currentTimeMillis();
@@ -64,15 +71,16 @@ public class Shape {
 			board.setCurrentShape();
 		}
 
+		//가로축 블록 안겹치게 함, 좌우 이동
 		if (!(x + deltaX + coords[0].length > 10) && !(x + deltaX < 0)) {
-
+			
 			for (int row = 0; row < coords.length; row++) {
 				for (int col = 0; col < coords[row].length; col++) {
 					if (coords[row][col] != 0) {
+						//떨어지고 난뒤 안움직이게 함
 						if (board.getBoard()[y + row][x + deltaX + col] != 0) {
 							moveX = false;
 						}
-
 					}
 				}
 			}
@@ -81,13 +89,12 @@ public class Shape {
 				x += deltaX;
 
 		}
-
+		
+		//내려올때 블록 겹치게함 방지, 내려옴
 		if (!(y + 1 + coords.length > 20)) {
-
 			for (int row = 0; row < coords.length; row++) {
 				for (int col = 0; col < coords[row].length; col++) {
-					if (coords[row][col] != 0) {
-
+					if (coords[row][col] != 0) { // 배열에 뭔가가 들어있을때
 						if (board.getBoard()[y + 1 + row][x + col] != 0) {
 							collision = true;
 						}
@@ -106,8 +113,8 @@ public class Shape {
 	}
 
 	public void render(Graphics g) {
-
-		// 도형 떨어질때 과정 그림
+		
+		// 현재 도형(움직이는 역할 X)
 		for (int row = 0; row < coords.length; row++) {
 			for (int col = 0; col < coords[0].length; col++) {
 				if (coords[row][col] != 0) {
