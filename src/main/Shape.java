@@ -31,7 +31,7 @@ public class Shape {
 	private boolean moveX = false, moveY = false;
 	private boolean land = false;
 	private int direction = 0;
-	
+
 	private boolean QuickDown = false;
 
 	public Shape(int[][] coords, BufferedImage block, Board board, int color) {
@@ -60,16 +60,14 @@ public class Shape {
 
 	}
 
-
 	public void update() {
-
 		// 움직 일 수 있게 함
 		moveX = true;
 		moveY = true;
 		// 시간경과마다 한칸씩 내려오게하기위한 변수 초기화
 		time += System.currentTimeMillis() - lastTime;
 		lastTime = System.currentTimeMillis();
-		if(QuickDown)
+		if (QuickDown)
 			return;
 		checkX();
 		checkY();
@@ -84,27 +82,6 @@ public class Shape {
 			drawBlock();
 		}
 	}
-	public void drawBlock() {
-		if (time > 500 || QuickDown) {
-			for (int row = 0; row < coords.length; row++) {
-				for (int col = 0; col < coords[0].length; col++) {
-					if (coords[row][col] != 0) {
-						// 현재 보드에 있는 쌓인 블록들과 합침
-						board.getBoard()[y+row][x + col] = color;
-					}
-				}
-			}
-			// 줄 검사(삭제)
-			checkLine();
-			// 현재 보드에 도형 최신화
-			land = true;
-			board.isGameOver(this);
-			board.setCurrentShape();
-		}
-	}
-	public boolean isLand() {
-		return land;
-	}
 
 	public void render(Graphics g) {
 
@@ -117,10 +94,33 @@ public class Shape {
 			}
 		}
 	}
-	
-	public void checkX() {
 
-		// 가로축 블록 안겹치게 함, 좌우 이동
+	// 도형 떨어졌을 때 그리는 부분
+	public void drawBlock() {
+		if (time > 500 || QuickDown) {
+			for (int row = 0; row < coords.length; row++) {
+				for (int col = 0; col < coords[0].length; col++) {
+					if (coords[row][col] != 0) {
+						// 현재 보드에 있는 쌓인 블록들과 합침
+						board.getBoard()[y + row][x + col] = color;
+					}
+				}
+			}
+			// 줄 검사(삭제)
+			checkLine();
+			// 현재 보드에 도형 최신화
+			land = true;
+			board.isGameOver(this);
+			board.setCurrentShape();
+		}
+	}
+
+	public boolean isLand() {
+		return land;
+	}
+
+	// 가로축 블록 안겹치게 함, 좌우 이동
+	public void checkX() {
 		// !(x(4) + 움직인 위치 + 움직이는 도형의 X축 > 10) 그리고 !(x(4) + 움직인 위치 < 0)
 		if (!(x + deltaX + coords[0].length > 10) && !(x + deltaX < 0)) {
 			for (int row = 0; row < coords.length; row++) {
@@ -139,8 +139,8 @@ public class Shape {
 		}
 	}
 
+	// 내려올때 블록 겹치게함 방지, 내려옴
 	public void checkY() {
-		// 내려올때 블록 겹치게함 방지, 내려옴
 		// !(y(0) + 1 + 현재 도형의 y축 > 20)
 		if (!(y + 1 + coords.length > 22)) {
 			for (int row = 0; row < coords.length; row++) {
@@ -164,11 +164,12 @@ public class Shape {
 		}
 	}
 
+	// 줄 삭제 부분
 	private void checkLine() {
 		/*
-		 * 세로(20) * 가로(10) 가로 한줄씩 검사 첫 번째 if 해당칸에 블록이 차있으면 count++ 두 번째 if count가 10보다
-		 * 작으면 size-- / count가 10보다 크거나 같으면 size--를 하지 않음 => 몇줄 없앴는지 알 수 있음 가로줄이 꽉차있으면 그
-		 * 위의 줄의 내용을 덮어 씌움
+		 * 세로(22) * 가로(10) 한줄씩 검사 첫 번째 if 해당칸에 블록이 차있으면 count++ 두 번째 if count가 10보다 작으면
+		 * size-- / count가 10보다 크거나 같으면 size--를 하지 않음 => 몇줄 없앴는지 알 수 있음 가로줄이 꽉차있으면 그 위의
+		 * 줄의 내용을 덮어 씌움
 		 */
 		int size = board.getBoard().length - 1;
 		for (int i = board.getBoard().length - 1; i >= 0; i--) {
@@ -191,7 +192,7 @@ public class Shape {
 
 		if (collision)
 			return;
-		if(QuickDown)
+		if (QuickDown)
 			return;
 
 		int[][] rotatedShape = null;
@@ -235,6 +236,32 @@ public class Shape {
 		return temp;
 	}
 
+	// 아래키 눌렀을 때 호출되는 메소드
+	public void speedUp() {
+		delay = fast;
+	}
+
+	// 아래키 뗐을 때 호출되는 메소드
+	public void speedDown() {
+		delay = normal;
+	}
+
+	// 스페이스키 눌렀을 때 호출되는 메소드
+	public void quickDown() {
+		if (board.getGameOver() || board.getGamePause())
+			return;
+		while (true) {
+			checkX();
+			checkY();
+			if (moveY)
+				y++;
+			else
+				break;
+		}
+		QuickDown = true;
+		drawBlock();
+	}
+
 	// 각종 게터, 세터
 	public int getColor() {
 		return color;
@@ -250,30 +277,6 @@ public class Shape {
 
 	public void setDeltaX(int deltaX) {
 		this.deltaX = deltaX;
-	}
-
-	public void speedUp() {
-		delay = fast;
-	}
-
-	public void speedDown() {
-		delay = normal;
-	}
-	
-	
-	public void quickDown() {
-		if(board.getGameOver() || board.getGamePause())
-			return;
-		while(true) {
-			checkX();
-			checkY();
-			if(moveY)
-				y++;
-			else
-				break;
-		}
-		QuickDown = true;
-		drawBlock();
 	}
 
 	public BufferedImage getBlock() {
@@ -303,9 +306,4 @@ public class Shape {
 	public void setDirection(int direction) {
 		this.direction = direction;
 	}
-
-	public void setMoveX(boolean a) {
-		this.moveX = a;
-	}
-
 }

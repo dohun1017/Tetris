@@ -24,19 +24,9 @@ import javax.swing.Timer;
 
 public class Board extends JPanel implements KeyListener, MouseListener, MouseMotionListener {
 
-	// Assets
-
-	/**
-	 * 
-	 */
-
-	private static final int VISSIBLEROW = 20;
-	private static final int HIDDENROW = 2;
 	private static final int TOTALROW = 22;
 
 	private static final long serialVersionUID = 1L;
-
-	private Clip music;
 
 	private BufferedImage blocks, pause, refresh;
 
@@ -72,12 +62,12 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 	private boolean gamePaused = false;
 
 	private boolean gameOver = false;
-	
+
 	// 홀드 할 수 있는지
 	private boolean holdPossible = true;
 
 	// 홀드 기본 값
-	private int h_origin = 0;
+	private int holdUse = 0;
 
 	// 버튼 누른 경과
 	private Timer buttonLapse = new Timer(300, new ActionListener() {
@@ -104,12 +94,8 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 		pause = ImageLoader.loadImage("/pause.png");
 		refresh = ImageLoader.loadImage("/refresh.png");
 
-		music = ImageLoader.LoadSound("/music.wav");
+		setBackground(new Color(255, 255, 240));
 
-		music.loop(Clip.LOOP_CONTINUOUSLY);
-		
-		setBackground(new Color(255,255,240));
-		
 		// 디폴트 마우스 위치
 		mouseX = 0;
 		mouseY = 0;
@@ -144,6 +130,7 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 		shapes[6] = new Shape(new int[][] { { 1, 1 }, { 1, 1 }, // O shape;
 		}, blocks.getSubimage(blockSize * 6, 0, blockSize, blockSize), this, 7);
 
+
 	}
 
 	private void update() {
@@ -154,12 +141,11 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 			if (gamePaused) {
 				if (holdPossible) {
 					holdPossible = false;
-					h_origin = 1;
 				}
 			} else {
-				if (h_origin == 1) {
+				if (holdUse == 0) {
 					holdPossible = true;
-					h_origin = 0;
+					holdUse = 1;
 				}
 			}
 		}
@@ -176,6 +162,7 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 		currentShape.update();
 	}
 
+	// 페인트 부분
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
@@ -263,10 +250,9 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 		// 가로줄 그리기
 		for (int i = 0; i <= TOTALROW; i++) {
 			g2d.drawLine(0, i * blockSize, boardWidth * blockSize, i * blockSize);
-			if(i == 1) {
+			if (i == 1) {
 				g2d.setStroke(new BasicStroke(4.0f));
-			}
-			else
+			} else
 				g2d.setStroke(new BasicStroke(2));
 		}
 
@@ -279,6 +265,44 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 		g2d.drawRoundRect(305, 200, 128, 120, 5, 5);
 	}
 
+	// 게임 시작 시 호출(첫 1회)
+	public void startGame() {
+		stopGame();
+		setNextShape();
+		setCurrentShape();
+		holdShape = null;
+		if (gamePaused)
+			holdPossible = false;
+		else
+			holdPossible = true;
+		holdUse = 0;
+		gameOver = false;
+		looper.start();
+	}
+
+	// 게임 정지 시 호출(게임오버)
+	public void stopGame() {
+		score = 0;
+		for (int row = 0; row < board.length; row++) {
+			for (int col = 0; col < board[row].length; col++) {
+				board[row][col] = 0;
+			}
+		}
+		looper.stop();
+	}
+
+	// 게임 시작
+	class GameLooper implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			update();
+			repaint();
+		}
+
+	}
+
+	// 기능부분
 	// 다음 도형 설정(모든 도형)
 	public void setNextShape() {
 		nextIndex[0] = nextIndex[1];
@@ -297,7 +321,8 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 		holdPossible = true;
 
 	}
-	//게임 오버 검사
+
+	// 게임 오버 검사
 	public boolean isGameOver(Shape currentShape) {
 		for (int row = 0; row < board.length; row++) {
 			for (int col = 0; col < board[0].length; col++) {
@@ -313,6 +338,7 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 		return board;
 	}
 
+	// 키 눌렀을 때 이벤트들
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_UP) {
@@ -337,10 +363,9 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 			holdShape();
 		if (e.getKeyCode() == KeyEvent.VK_SPACE)
 			currentShape.quickDown();
-		if (e.getKeyCode() == KeyEvent.VK_ENTER)
-			currentShape.setMoveX(true);
 	}
 
+	// 내려가는 키 뗄 때 원래의 속도
 	@Override
 	public void keyReleased(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_DOWN)
@@ -350,33 +375,6 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 	@Override
 	public void keyTyped(KeyEvent e) {
 
-	}
-
-	// 게임 시작 시 호출(첫 1회)
-	public void startGame() {
-		stopGame();
-		setNextShape();
-		setCurrentShape();
-		holdShape = null;
-		if (gamePaused)
-			holdPossible = false;
-		else
-			holdPossible = true;
-		h_origin = 1;
-		gameOver = false;
-		looper.start();
-
-	}
-
-	// 게임 정지 시 호출(게임오버)
-	public void stopGame() {
-		score = 0;
-		for (int row = 0; row < board.length; row++) {
-			for (int col = 0; col < board[row].length; col++) {
-				board[row][col] = 0;
-			}
-		}
-		looper.stop();
 	}
 
 	// 도형 홀드 메소드
@@ -398,17 +396,7 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 		holdPossible = false;
 	}
 
-	// 게임 시작
-	class GameLooper implements ActionListener {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			update();
-			repaint();
-		}
-
-	}
-
+	// 마우스 관련
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		mouseX = e.getX();
@@ -440,18 +428,17 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
-
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-
 	}
 
 	public void addScore(int line) {
 		score += line;
 	}
 
+	// 게터 세터 부분
 	public boolean getGameOver() {
 		return gameOver;
 	}
