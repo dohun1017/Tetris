@@ -27,9 +27,12 @@ public class Shape {
 
 	private Board board;
 
-	private boolean collision = false, moveX = false;
+	private boolean collision = false;
+	private boolean moveX = false, moveY = false;
 
 	private int direction = 0;
+	
+	private boolean QuickDown = false;
 
 	public Shape(int[][] coords, BufferedImage block, Board board, int color) {
 		this.coords = coords;
@@ -57,68 +60,54 @@ public class Shape {
 
 	}
 
+
 	public void update() {
-		//바닥 움직이기 위한 변수(수정)
-		long start, end;
-		
+
 		// 움직 일 수 있게 함
 		moveX = true;
-
-		// ??
+		moveY = true;
+		// 시간경과마다 한칸씩 내려오게하기위한 변수 초기화
 		time += System.currentTimeMillis() - lastTime;
 		lastTime = System.currentTimeMillis();
 
-		// 충돌이 true이면
-		if (collision) {
-			for (int row = 0; row < coords.length; row++) {
-				for (int col = 0; col < coords[0].length; col++) {
-					if (coords[row][col] != 0)
-						// 현재 보드에 있는 쌓인 블록들과 합침
-						board.getBoard()[y + row][x + col] = color;
-				}
-			}
-			// 줄 검사(삭제)
-			checkLine();
-			// 현재 보드에 도형 최신화
-			board.setCurrentShape();
-		}
-
-		// 내려올때 블록 겹치게함 방지, 내려옴
-		// !(y(0) + 1 + 현재 도형의 y축 > 20)
-		if (!(y + 1 + coords.length > 20)) {
-			for (int row = 0; row < coords.length; row++) {
-				for (int col = 0; col < coords[row].length; col++) {
-					if (coords[row][col] != 0) { // 현재 도형의 배열 중 속성이 0이 아닐 때
-						if (board.getBoard()[y + 1 + row][x + col] != 0) { // 현재 보드의[y+1+세로][x+가로]가 0이 아닐 때
-							collision = true;
-						}
-					}
-				}
-			}
-			// 내려오는 것 확인(속도에 따라 delay가 달라짐) y축 1증가
+		checkX();
+		checkY();
+		deltaX = 0;
+		if (moveY) {
 			if (time > delay) {
 				y++;
 				time = 0;
 			}
+		} else {
+			if (time > 450 || QuickDown) {
+				for (int row = 0; row < coords.length; row++) {
+					for (int col = 0; col < coords[0].length; col++) {
+						if (coords[row][col] != 0)
+							// 현재 보드에 있는 쌓인 블록들과 합침
+							board.getBoard()[y + row][x + col] = color;
+					}
+				}
+				// 줄 검사(삭제)
+				checkLine();
+				// 현재 보드에 도형 최신화
+				board.setCurrentShape();
+			}
 		}
-		
-		//다 내려 왔을 때
-		else {
-			collision = true;
-		}
-		
-		/* 바로 땅바닥에 붙지 않게 하기 위한 도전
-		//다 내려 왔을 때
-		else {
-			start = System.currentTimeMillis();
-			while (true) {
-				end = System.currentTimeMillis();
-				if (end - start >= 1000) {
-					collision = true;
-					break;
+	}
+
+	public void render(Graphics g) {
+
+		// 현재 도형(움직이는 역할 X)
+		for (int row = 0; row < coords.length; row++) {
+			for (int col = 0; col < coords[0].length; col++) {
+				if (coords[row][col] != 0) {
+					g.drawImage(block, col * 30 + x * 30, row * 30 + y * 30, null);
 				}
 			}
-		}*/
+		}
+	}
+	
+	public void checkX() {
 
 		// 가로축 블록 안겹치게 함, 좌우 이동
 		// !(x(4) + 움직인 위치 + 움직이는 도형의 X축 > 10) 그리고 !(x(4) + 움직인 위치 < 0)
@@ -133,24 +122,33 @@ public class Shape {
 					}
 				}
 			}
-
 			// 가로축이동이 안되면 x(4) + 움직인 위치
 			if (moveX)
 				x += deltaX;
-
 		}
-
-		deltaX = 0;
 	}
 
-	public void render(Graphics g) {
-
-		// 현재 도형(움직이는 역할 X)
-		for (int row = 0; row < coords.length; row++) {
-			for (int col = 0; col < coords[0].length; col++) {
-				if (coords[row][col] != 0) {
-					g.drawImage(block, col * 30 + x * 30, row * 30 + y * 30 - 60, null);
+	public void checkY() {
+		// 내려올때 블록 겹치게함 방지, 내려옴
+		// !(y(0) + 1 + 현재 도형의 y축 > 20)
+		if (!(y + 1 + coords.length > 20)) {
+			for (int row = 0; row < coords.length; row++) {
+				for (int col = 0; col < coords[row].length; col++) {
+					if (coords[row][col] != 0) { // 현재 도형의 배열 중 속성이 0이 아닐 때
+						if (board.getBoard()[y + 1 + row][x + col] != 0) { // 현재 보드의[y+1+세로][x+가로]가 0이 아닐 때
+							if (moveY) {
+								moveY = false;
+							}
+						}
+					}
 				}
+			}
+		}
+
+		// 다 내려 왔을 때
+		else {
+			if (moveY) {
+				moveY = false;
 			}
 		}
 	}
@@ -161,23 +159,7 @@ public class Shape {
 		 * 작으면 size-- / count가 10보다 크거나 같으면 size--를 하지 않음 => 몇줄 없앴는지 알 수 있음 가로줄이 꽉차있으면 그
 		 * 위의 줄의 내용을 덮어 씌움
 		 */
-//		//원본
-//		int size = board.getBoard().length - 1;
-//		for (int i = board.getBoard().length - 1; i >= 0; i--) {
-//			int count = 0;
-//			for (int j = 0; j < board.getBoard()[0].length; j++) {
-//				if (board.getBoard()[i][j] != 0)
-//					count++;
-//				board.getBoard()[size][j] = board.getBoard()[i][j];
-//			}
-//			if (count < board.getBoard()[0].length) {
-//				size--;
-//			}
-//		}
-//		if (size >= 0)
-//			board.addScore(size + 1);
-//	}
-		int size = board.getBoard().length -1;
+		int size = board.getBoard().length - 1;
 		for (int i = board.getBoard().length - 1; i >= 0; i--) {
 			int count = 0;
 			for (int j = 0; j < board.getBoard()[0].length; j++) {
@@ -192,6 +174,7 @@ public class Shape {
 		if (size >= 0)
 			board.addScore(size + 1);
 	}
+
 	// 도형 회전 메소드
 	public void rotateShape() {
 
@@ -262,6 +245,10 @@ public class Shape {
 
 	public void speedDown() {
 		delay = normal;
+	}
+	public void quickDown() {
+		delay = 0;
+		QuickDown = true;
 	}
 
 	public BufferedImage getBlock() {

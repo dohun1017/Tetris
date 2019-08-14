@@ -331,6 +331,8 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 		}
 		if (e.getKeyCode() == KeyEvent.VK_C)
 			holdShape();
+		if (e.getKeyCode() == KeyEvent.VK_SPACE)
+			currentShape.quickDown();
 		if(e.getKeyCode() == KeyEvent.VK_ENTER)
 			currentShape.setMoveX(true);
 	}
@@ -433,7 +435,7 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
-
+		
 	}
 
 	@Override
