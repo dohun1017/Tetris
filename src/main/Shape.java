@@ -29,7 +29,7 @@ public class Shape {
 
 	private boolean collision = false;
 	private boolean moveX = false, moveY = false;
-
+	private boolean land = false;
 	private int direction = 0;
 	
 	private boolean QuickDown = false;
@@ -69,7 +69,8 @@ public class Shape {
 		// 시간경과마다 한칸씩 내려오게하기위한 변수 초기화
 		time += System.currentTimeMillis() - lastTime;
 		lastTime = System.currentTimeMillis();
-
+		if(QuickDown)
+			return;
 		checkX();
 		checkY();
 		deltaX = 0;
@@ -79,20 +80,29 @@ public class Shape {
 				time = 0;
 			}
 		} else {
-			if (time > 450 || QuickDown) {
-				for (int row = 0; row < coords.length; row++) {
-					for (int col = 0; col < coords[0].length; col++) {
-						if (coords[row][col] != 0)
-							// 현재 보드에 있는 쌓인 블록들과 합침
-							board.getBoard()[y + row][x + col] = color;
-					}
-				}
-				// 줄 검사(삭제)
-				checkLine();
-				// 현재 보드에 도형 최신화
-				board.setCurrentShape();
-			}
+			land = true;
+			drawBlock();
 		}
+	}
+	public void drawBlock() {
+		if (time > 5050 || QuickDown) {
+			for (int row = 0; row < coords.length; row++) {
+				for (int col = 0; col < coords[0].length; col++) {
+					if (coords[row][col] != 0)
+						// 현재 보드에 있는 쌓인 블록들과 합침
+						board.getBoard()[y + row][x + col] = color;
+				}
+			}
+			// 줄 검사(삭제)
+			checkLine();
+			// 현재 보드에 도형 최신화
+			land = true;
+			board.isGameOver(this);
+			board.setCurrentShape();
+		}
+	}
+	public boolean isLand() {
+		return land;
 	}
 
 	public void render(Graphics g) {
@@ -180,6 +190,8 @@ public class Shape {
 
 		if (collision)
 			return;
+		if(QuickDown)
+			return;
 
 		int[][] rotatedShape = null;
 
@@ -246,9 +258,23 @@ public class Shape {
 	public void speedDown() {
 		delay = normal;
 	}
+	
+	
 	public void quickDown() {
-		delay = 0;
+		if(board.getGameOver() || board.getGamePause())
+			return;
+		while(true) {
+			checkX();
+			checkY();
+			if(moveY)
+				y++;
+			else
+				break;
+		}
 		QuickDown = true;
+		drawBlock();
+		board.setNextShape();
+//		board.getBoard().length
 	}
 
 	public BufferedImage getBlock() {
