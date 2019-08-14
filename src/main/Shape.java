@@ -85,12 +85,13 @@ public class Shape {
 		}
 	}
 	public void drawBlock() {
-		if (time > 5050 || QuickDown) {
+		if (time > 500 || QuickDown) {
 			for (int row = 0; row < coords.length; row++) {
 				for (int col = 0; col < coords[0].length; col++) {
-					if (coords[row][col] != 0)
+					if (coords[row][col] != 0) {
 						// 현재 보드에 있는 쌓인 블록들과 합침
-						board.getBoard()[y + row][x + col] = color;
+						board.getBoard()[y+row][x + col] = color;
+					}
 				}
 			}
 			// 줄 검사(삭제)
@@ -141,7 +142,7 @@ public class Shape {
 	public void checkY() {
 		// 내려올때 블록 겹치게함 방지, 내려옴
 		// !(y(0) + 1 + 현재 도형의 y축 > 20)
-		if (!(y + 1 + coords.length > 20)) {
+		if (!(y + 1 + coords.length > 22)) {
 			for (int row = 0; row < coords.length; row++) {
 				for (int col = 0; col < coords[row].length; col++) {
 					if (coords[row][col] != 0) { // 현재 도형의 배열 중 속성이 0이 아닐 때
@@ -273,8 +274,6 @@ public class Shape {
 		}
 		QuickDown = true;
 		drawBlock();
-		board.setNextShape();
-//		board.getBoard().length
 	}
 
 	public BufferedImage getBlock() {

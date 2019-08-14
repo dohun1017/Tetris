@@ -12,8 +12,8 @@ public class Window{
 	
 	public Window(){
 		
-		window = new JFrame("Tetris2");
-		window.setSize(WIDTH, HEIGHT);
+		window = new JFrame("Tetris");
+		window.setSize(WIDTH, 695);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setLocationRelativeTo(null);
 		window.setResizable(false);	

@@ -31,6 +31,7 @@ public class Title extends JPanel implements MouseListener, MouseMotionListener{
 	
 	
 	public Title(Window window){
+		setBackground(Color.BLACK);
 		try {
 			title = ImageIO.read(Board.class.getResource("/Title.png"));
 			instructions = ImageIO.read(Board.class.getResource("/arrow.png"));

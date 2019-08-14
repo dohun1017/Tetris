@@ -38,10 +38,10 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 
 	private Clip music;
 
-	private BufferedImage blocks, background, pause, refresh;
+	private BufferedImage blocks, pause, refresh;
 
 	// 플레이 할 수 있는 넓이
-	private final int boardHeight = 20, boardWidth = 10;
+	private final int boardHeight = 22, boardWidth = 10;
 
 	// 블록 사이즈
 	private final int blockSize = 30;
@@ -100,8 +100,6 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 	public Board() {
 		// 블록 불러오기
 		blocks = ImageLoader.loadImage("/tiles.png");
-		// 배경 불러오기
-		background = ImageLoader.loadImage("/background.png");
 		// 정지, 새로고침 버튼
 		pause = ImageLoader.loadImage("/pause.png");
 		refresh = ImageLoader.loadImage("/refresh.png");
@@ -109,7 +107,9 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 		music = ImageLoader.LoadSound("/music.wav");
 
 		music.loop(Clip.LOOP_CONTINUOUSLY);
-
+		
+		setBackground(new Color(255,255,240));
+		
 		// 디폴트 마우스 위치
 		mouseX = 0;
 		mouseY = 0;
@@ -179,9 +179,6 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
-		// 배경 그리기
-		g.drawImage(background, 0, 0, null);
-
 		// 쌓인 블록 그리기
 		for (int row = 0; row < board.length; row++) {
 			for (int col = 0; col < board[row].length; col++) {
@@ -241,19 +238,19 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 		// 게임 정지시
 		if (gamePaused) {
 			String gamePausedString = "Game Paused";
-			g.setColor(Color.WHITE);
+			g.setColor(Color.BLACK);
 			g.setFont(new Font("Georgia", Font.BOLD, 30));
 			g.drawString(gamePausedString, 35, Window.HEIGHT / 2);
 		}
 		// 게임 오버시
 		if (gameOver) {
 			String gameOverString = "Game Over";
-			g.setColor(Color.WHITE);
+			g.setColor(Color.BLACK);
 			g.setFont(new Font("Georgia", Font.BOLD, 30));
 			g.drawString(gameOverString, 50, Window.HEIGHT / 2);
 		}
 		// 점수 텍스트 색깔, 폰트, 그리기
-		g.setColor(Color.WHITE);
+		g.setColor(Color.BLACK);
 		g.setFont(new Font("Georgia", Font.BOLD, 20));
 		g.drawString("SCORE", Window.WIDTH - 125, Window.HEIGHT / 2 + 40);
 		g.drawString(score + "", Window.WIDTH - 125, Window.HEIGHT / 2 + 70);
@@ -265,7 +262,12 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 
 		// 가로줄 그리기
 		for (int i = 0; i <= TOTALROW; i++) {
-			g2d.drawLine(0, i * blockSize - 60, boardWidth * blockSize, i * blockSize - 60);
+			g2d.drawLine(0, i * blockSize, boardWidth * blockSize, i * blockSize);
+			if(i == 1) {
+				g2d.setStroke(new BasicStroke(4.0f));
+			}
+			else
+				g2d.setStroke(new BasicStroke(2));
 		}
 
 		// 세로줄 그리기
@@ -295,11 +297,11 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 		holdPossible = true;
 
 	}
-
+	//게임 오버 검사
 	public boolean isGameOver(Shape currentShape) {
 		for (int row = 0; row < board.length; row++) {
 			for (int col = 0; col < board[0].length; col++) {
-				if (board[0][col] != 0 && currentShape.isLand()) {
+				if (board[2][col] != 0 && currentShape.isLand()) {
 					gameOver = true;
 				}
 			}
