@@ -8,25 +8,17 @@ import javax.xml.ws.handler.MessageContext.Scope;
 public class Shape {
 
 	private int color;
-
 	private int x, y;
-
 	private long time, lastTime;
-
 	private int normal = 600, fast = 50;
-
 	private int delay;
-
 	private BufferedImage block;
-
 	private int[][] coords;
-
 	private int[][] reference;
-
 	private int deltaX;
-
 	private Board board;
-
+	
+	private int holdUse = 0;
 	private boolean collision = false;
 	private boolean moveX = false, moveY = false;
 	private boolean land = false;
@@ -115,10 +107,6 @@ public class Shape {
 		}
 	}
 
-	public boolean isLand() {
-		return land;
-	}
-
 	// 가로축 블록 안겹치게 함, 좌우 이동
 	public void checkX() {
 		// !(x(4) + 움직인 위치 + 움직이는 도형의 X축 > 10) 그리고 !(x(4) + 움직인 위치 < 0)
@@ -138,7 +126,8 @@ public class Shape {
 				x += deltaX;
 		}
 	}
-
+	
+	
 	// 내려올때 블록 겹치게함 방지, 내려옴
 	public void checkY() {
 		// !(y(0) + 1 + 현재 도형의 y축 > 20)
@@ -155,7 +144,6 @@ public class Shape {
 				}
 			}
 		}
-
 		// 다 내려 왔을 때
 		else {
 			if (moveY) {
@@ -305,5 +293,14 @@ public class Shape {
 
 	public void setDirection(int direction) {
 		this.direction = direction;
+	}
+	public int getHoldUse() {
+		return holdUse;
+	}
+	public void setHoldUse(int holdUse) {
+		this.holdUse = holdUse;
+	}
+	public boolean getLand() {
+		return land;
 	}
 }
