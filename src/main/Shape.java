@@ -36,9 +36,7 @@ public class Shape {
 		y = 0;
 
 		// 속도 난이도 변경
-		if (this.board.getScore() >= 100)
-			normal = 100;
-		else if (this.board.getScore() >= 110)
+		if (this.board.getScore() >= 110)
 			normal = 70;
 		else
 			normal -= (this.board.getScore() / 10) * 50;
