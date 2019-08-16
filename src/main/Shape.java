@@ -54,11 +54,13 @@ public class Shape {
 		// 움직 일 수 있게 함
 		moveX = true;
 		moveY = true;
+		
+		if (QuickDown)
+			return;
+		
 		// 시간경과마다 한칸씩 내려오게하기위한 변수 초기화
 		time += System.currentTimeMillis() - lastTime;
 		lastTime = System.currentTimeMillis();
-		if (QuickDown)
-			return;
 		checkX();
 		checkY();
 		deltaX = 0;
@@ -99,7 +101,6 @@ public class Shape {
 			// 줄 검사(삭제)
 			checkLine();
 			// 현재 보드에 도형 최신화
-			land = true;
 			board.isGameOver(this);
 			board.setCurrentShape();
 		}

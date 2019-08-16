@@ -238,7 +238,7 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 		g2d.drawRoundRect(305, 200, 128, 120, 5, 5);
 	}
 
-	// 게임 시작 시 호출(첫 1회)
+	// 게임 시작 시 호출
 	public void startGame() {
 		stopGame();
 		setNextShape();
