@@ -8,7 +8,7 @@ import javax.xml.ws.handler.MessageContext.Scope;
 public class Shape {
 
 	private int color;
-	private int x, y;
+	private int x, y, moveWall;
 	private long time, lastTime;
 	private int normal = 600, fast = 50;
 	private int delay;
@@ -17,10 +17,10 @@ public class Shape {
 	private int[][] reference;
 	private int deltaX;
 	private Board board;
-	
+
 	private int holdUse = 0;
 	private boolean moveX = false, moveY = false;
-	private boolean land = false;
+	private boolean land = false, reachWall = false;
 	private int direction = 0;
 
 	private boolean QuickDown = false;
@@ -53,10 +53,10 @@ public class Shape {
 		// 움직 일 수 있게 함
 		moveX = true;
 		moveY = true;
-		
+
 		if (QuickDown)
 			return;
-		
+
 		// 시간경과마다 한칸씩 내려오게하기위한 변수 초기화
 		time += System.currentTimeMillis() - lastTime;
 		lastTime = System.currentTimeMillis();
@@ -69,7 +69,6 @@ public class Shape {
 				time = 0;
 			}
 		} else {
-			land = true;
 			drawBlock();
 		}
 	}
@@ -124,10 +123,10 @@ public class Shape {
 				x += deltaX;
 		}
 	}
-	
-	
+
 	// 내려올때 블록 겹치게함 방지, 내려옴
 	public void checkY() {
+		land = false;
 		// !(y(0) + 1 + 현재 도형의 y축 > 20)
 		if (!(y + 1 + coords.length > 22)) {
 			for (int row = 0; row < coords.length; row++) {
@@ -175,9 +174,6 @@ public class Shape {
 
 	// 도형 회전 메소드
 	public void rotateShape() {
-
-		if (land)
-			return;
 		if (QuickDown)
 			return;
 
@@ -187,11 +183,26 @@ public class Shape {
 			rotatedShape = transposeMatrixRight(coords);
 		else
 			rotatedShape = transposeMatrixLeft(coords);
-
-		if ((x + rotatedShape[0].length > 10) || (y + rotatedShape.length > 20)) {
+		
+		//바뀔 모양이 보드의 y축보다 길어질 때 
+		if ((y + rotatedShape.length > 22)) {
 			return;
 		}
-
+		//바뀔 모양이 보드의 x축보다 길어질 때
+		if (x + rotatedShape[0].length > 10) {
+			reachWall = true;
+			moveWall = 0;
+			for(;x+rotatedShape[0].length != 10;) {
+				x--;
+				moveWall++;
+			}
+		} else {
+			if (reachWall) {
+				x+=moveWall;
+				reachWall = false;
+			}
+		}
+		
 		for (int row = 0; row < rotatedShape.length; row++) {
 			for (int col = 0; col < rotatedShape[row].length; col++) {
 				if (rotatedShape[row][col] != 0) {
@@ -292,12 +303,15 @@ public class Shape {
 	public void setDirection(int direction) {
 		this.direction = direction;
 	}
+
 	public int getHoldUse() {
 		return holdUse;
 	}
+
 	public void setHoldUse(int holdUse) {
 		this.holdUse = holdUse;
 	}
+
 	public boolean getLand() {
 		return land;
 	}
