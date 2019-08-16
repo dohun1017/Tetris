@@ -19,7 +19,6 @@ public class Shape {
 	private Board board;
 	
 	private int holdUse = 0;
-	private boolean collision = false;
 	private boolean moveX = false, moveY = false;
 	private boolean land = false;
 	private int direction = 0;
@@ -177,7 +176,7 @@ public class Shape {
 	// 도형 회전 메소드
 	public void rotateShape() {
 
-		if (collision)
+		if (land)
 			return;
 		if (QuickDown)
 			return;
@@ -238,7 +237,6 @@ public class Shape {
 		if (board.getGameOver() || board.getGamePause())
 			return;
 		while (true) {
-			checkX();
 			checkY();
 			if (moveY)
 				y++;
@@ -246,6 +244,7 @@ public class Shape {
 				break;
 		}
 		QuickDown = true;
+		land = true;
 		drawBlock();
 	}
 

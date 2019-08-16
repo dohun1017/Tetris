@@ -82,7 +82,7 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 				refresh.getHeight() + refresh.getHeight() / 2);
 
 		// 게임 루퍼 생성
-		looper = new Timer(1000/240, new GameLooper());
+		looper = new Timer(1000 / 240, new GameLooper());
 
 		// 도형들 생성
 		shapes[0] = new Shape(new int[][] { { 1, 1, 1, 1 } // I shape;
@@ -173,7 +173,7 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 					}
 				}
 			}
-		
+
 		// 게임오버가 아닐 때 현재도형 그리기
 		if (!gameOver)
 			currentShape.render(g);
@@ -256,6 +256,7 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 	// 게임 정지 시 호출(게임오버)
 	public void stopGame() {
 		score = 0;
+		holdPossible = false;
 		for (int row = 0; row < board.length; row++) {
 			for (int col = 0; col < board[row].length; col++) {
 				board[row][col] = 0;
@@ -298,12 +299,12 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 
 	// 게임 오버 검사
 	public boolean isGameOver(Shape currentShape) {
-		for (int row = 0; row < board.length; row++) {
-			for (int col = 0; col < board[0].length; col++) {
-				if (board[2][col] != 0 && currentShape.getLand()) {
-					gameOver = true;
-				}
+
+		for (int col = 0; col < board[0].length; col++) {
+			if (board[2][col] != 0 && currentShape.getLand()) {
+				gameOver = true;
 			}
+
 		}
 		return gameOver;
 	}
