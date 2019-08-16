@@ -87,7 +87,7 @@ public class Shape {
 
 	// 도형 떨어졌을 때 그리는 부분
 	public void drawBlock() {
-		if (time > 500 || QuickDown) {
+		if ((time > 500 || QuickDown)) {
 			for (int row = 0; row < coords.length; row++) {
 				for (int col = 0; col < coords[0].length; col++) {
 					if (coords[row][col] != 0) {
@@ -135,6 +135,7 @@ public class Shape {
 						if (board.getBoard()[y + 1 + row][x + col] != 0) { // 현재 보드의[y+1+세로][x+가로]가 0이 아닐 때
 							if (moveY) {
 								moveY = false;
+								land = true;
 							}
 						}
 					}
@@ -144,6 +145,7 @@ public class Shape {
 		// 다 내려 왔을 때
 		else {
 			if (moveY) {
+				land = true;
 				moveY = false;
 			}
 		}
@@ -174,7 +176,7 @@ public class Shape {
 
 	// 도형 회전 메소드
 	public void rotateShape() {
-		if (QuickDown)
+		if (QuickDown && land)
 			return;
 
 		int[][] rotatedShape = null;
