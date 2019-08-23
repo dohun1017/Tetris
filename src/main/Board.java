@@ -27,7 +27,7 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 	private static final int TOTALROW = 22;
 	private static final long serialVersionUID = 1L;
 
-	private BufferedImage blocks, pause, refresh;
+	private BufferedImage blocks, pause, refresh, back;
 	// 플레이 할 수 있는 넓이
 	private final int boardHeight = 22, boardWidth = 10;
 	// 블록 사이즈
@@ -43,7 +43,7 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 	// 마우스 이벤트
 	private int mouseX, mouseY;
 	private boolean leftClick = false;
-	private Rectangle stopBounds, refreshBounds;
+	private Rectangle stopBounds, refreshBounds, backBounds;
 	private boolean gamePaused = false;
 	private boolean gameOver = false;
 
@@ -69,6 +69,7 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 		// 정지, 새로고침 버튼
 		pause = ImageLoader.loadImage("/pause.png");
 		refresh = ImageLoader.loadImage("/refresh.png");
+		back = ImageLoader.loadImage("/back.png");
 
 		setBackground(new Color(255, 255, 240));
 
@@ -80,6 +81,8 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 		stopBounds = new Rectangle(350, 500, pause.getWidth(), pause.getHeight() + pause.getHeight() / 2);
 		refreshBounds = new Rectangle(350, 500 - refresh.getHeight() - 20, refresh.getWidth(),
 				refresh.getHeight() + refresh.getHeight() / 2);
+		backBounds = new Rectangle(350, 500 + back.getHeight() + 20, back.getWidth(),
+				back.getHeight() + back.getHeight() / 2);
 
 		// 게임 루퍼 생성
 		looper = new Timer(1000 / 240, new GameLooper());
@@ -110,7 +113,7 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 
 	private void update() {
 		// 게임 정지버튼 눌렀을 때(정지, 재시작)
-		if (stopBounds.contains(mouseX, mouseY) && leftClick && !buttonLapse.isRunning() && !gameOver) {
+		if (stopBounds.contains(mouseX-222, mouseY) && leftClick && !buttonLapse.isRunning() && !gameOver) {
 			buttonLapse.start();
 			gamePaused = !gamePaused;
 			if (gamePaused) {
@@ -124,8 +127,17 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 		}
 
 		// 새로고침버튼 눌렀을 때
-		if (refreshBounds.contains(mouseX, mouseY) && leftClick)
+		if (refreshBounds.contains(mouseX - 222, mouseY) && leftClick)
 			startGame();
+
+		// 뒤로가기버튼 눌렀을 때
+		if (backBounds.contains(mouseX - 222, mouseY) && leftClick) {
+			Window.whereBoard = 1;
+			Window.goTitle();
+			System.out.println("1p 고타이틀");
+			leftClick = !leftClick;
+			return;
+		}
 
 		// 게임정지, 게임오버 (아무것도 안할 때)
 		if (gamePaused || gameOver) {
@@ -179,7 +191,7 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 			currentShape.render(g);
 
 		// 게임 정지버튼 위에 올려놨을 때 버튼 모양
-		if (stopBounds.contains(mouseX, mouseY))
+		if (stopBounds.contains(mouseX - 222, mouseY))
 			g.drawImage(
 					pause.getScaledInstance(pause.getWidth() + 3, pause.getHeight() + 3, BufferedImage.SCALE_DEFAULT),
 					stopBounds.x + 3, stopBounds.y + 3, null);
@@ -188,13 +200,21 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 			g.drawImage(pause, stopBounds.x, stopBounds.y, null);
 
 		// 게임 재시작버튼 위에 올려놨을 때 버튼 모양
-		if (refreshBounds.contains(mouseX, mouseY))
+		if (refreshBounds.contains(mouseX - 222, mouseY))
 			g.drawImage(refresh.getScaledInstance(refresh.getWidth() + 3, refresh.getHeight() + 3,
 					BufferedImage.SCALE_DEFAULT), refreshBounds.x + 3, refreshBounds.y + 3, null);
 		// 게임 재시작버튼 위에서 해제 버튼 모양
 		else
 			g.drawImage(refresh, refreshBounds.x, refreshBounds.y, null);
 
+		// 게임 뒤로가기버튼 위에 올려놨을 때 버튼 모양
+		if (backBounds.contains(mouseX - 222, mouseY))
+			g.drawImage(back.getScaledInstance(back.getWidth() + 3, back.getHeight() + 3, BufferedImage.SCALE_DEFAULT),
+					backBounds.x + 3, backBounds.y + 3, null);
+		// 게임 뒤로가기버튼 위에서 해제 버튼 모양
+		else
+			g.drawImage(back, backBounds.x, backBounds.y, null);
+		
 		// 게임 정지시
 		if (gamePaused) {
 			String gamePausedString = "Game Paused";
@@ -417,6 +437,11 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 	}
 
 	// 게터 세터 부분
+	
+	public void setGamePause(boolean gamePaused) {
+		this.gamePaused = gamePaused;
+	}
+	
 	public boolean getGameOver() {
 		return gameOver;
 	}

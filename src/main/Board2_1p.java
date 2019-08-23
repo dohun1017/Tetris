@@ -22,7 +22,7 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-public class Board2_1p extends JPanel implements KeyListener, MouseListener, MouseMotionListener {
+public class Board2_1p extends JPanel implements KeyListener{
 
 	private static final int TOTALROW = 22;
 	private static final long serialVersionUID = 1L;
@@ -40,22 +40,13 @@ public class Board2_1p extends JPanel implements KeyListener, MouseListener, Mou
 	private static Shape2_1p currentShape, nextShape, n_nextShape, holdShape;
 	// 게임 루프
 	private Timer looper;
-	// 마우스 이벤트
-	private int mouseX, mouseY;
-	private boolean leftClick = false;
-	private Rectangle stopBounds, refreshBounds;
-	private boolean gamePaused = false;
-	private boolean gameOver = false;
+	
+	public static boolean gameRefresh = false;
+	public static boolean gamePaused = false;
+	public static boolean gameOver = false;
 
 	// 홀드 할 수 있는지
 	private boolean holdPossible = true;
-	// 마우스 버튼 누른시간 체크(0.6초를 누르고 있으면 2번 해당 기능 2번 실행)
-	private Timer buttonLapse = new Timer(300, new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			buttonLapse.stop();
-		}
-	});
 	// 점수
 	private int score = 0;
 	// 현재 도형 인덱스
@@ -66,20 +57,8 @@ public class Board2_1p extends JPanel implements KeyListener, MouseListener, Mou
 	public Board2_1p() {
 		// 블록 불러오기
 		blocks = ImageLoader.loadImage("/tiles.png");
-		// 정지, 새로고침 버튼
-		pause = ImageLoader.loadImage("/pause.png");
-		refresh = ImageLoader.loadImage("/refresh.png");
 
 		setBackground(new Color(255, 255, 240));
-
-		// 디폴트 마우스 위치
-		mouseX = 0;
-		mouseY = 0;
-
-		// 정지, 새로고침 영역
-		stopBounds = new Rectangle(350, 500, pause.getWidth(), pause.getHeight() + pause.getHeight() / 2);
-		refreshBounds = new Rectangle(350, 500 - refresh.getHeight() - 20, refresh.getWidth(),
-				refresh.getHeight() + refresh.getHeight() / 2);
 
 		// 게임 루퍼 생성
 		looper = new Timer(1000 / 240, new GameLooper());
@@ -109,28 +88,24 @@ public class Board2_1p extends JPanel implements KeyListener, MouseListener, Mou
 	}
 
 	private void update() {
-		// 게임 정지버튼 눌렀을 때(정지, 재시작)
-		if (stopBounds.contains(mouseX, mouseY) && leftClick && !buttonLapse.isRunning() && !gameOver) {
-			buttonLapse.start();
-			gamePaused = !gamePaused;
-			if (gamePaused) {
-				if (holdPossible) {
-					holdPossible = false;
-				}
-			} else {
-				if (currentShape.getHoldUse() == 0)
-					holdPossible = true;
-			}
+		// 게임 정지버튼 눌렀을 때
+		if (!gameOver && gamePaused) {
+			if (holdPossible)
+				holdPossible = false;
+		} else if (!gameOver && !gamePaused) {
+			if (currentShape.getHoldUse() == 0)
+				holdPossible = true;
 		}
 
 		// 새로고침버튼 눌렀을 때
-		if (refreshBounds.contains(mouseX, mouseY) && leftClick)
+		if (gameRefresh) {
+			gameRefresh = false;
 			startGame();
-
-		// 게임정지, 게임오버 (아무것도 안할 때)
-		if (gamePaused || gameOver) {
-			return;
 		}
+		// 게임정지, 게임오버 (아무것도 안할 때)
+		if (gamePaused || gameOver)
+			return;
+
 		// 현재도형 업데이트
 		currentShape.update();
 	}
@@ -177,23 +152,6 @@ public class Board2_1p extends JPanel implements KeyListener, MouseListener, Mou
 		// 게임오버가 아닐 때 현재도형 그리기
 		if (!gameOver)
 			currentShape.render(g);
-
-		// 게임 정지버튼 위에 올려놨을 때 버튼 모양
-		if (stopBounds.contains(mouseX, mouseY))
-			g.drawImage(
-					pause.getScaledInstance(pause.getWidth() + 3, pause.getHeight() + 3, BufferedImage.SCALE_DEFAULT),
-					stopBounds.x + 3, stopBounds.y + 3, null);
-		// 게임 정지버튼 위에서 해제 버튼 모양
-		else
-			g.drawImage(pause, stopBounds.x, stopBounds.y, null);
-
-		// 게임 재시작버튼 위에 올려놨을 때 버튼 모양
-		if (refreshBounds.contains(mouseX, mouseY))
-			g.drawImage(refresh.getScaledInstance(refresh.getWidth() + 3, refresh.getHeight() + 3,
-					BufferedImage.SCALE_DEFAULT), refreshBounds.x + 3, refreshBounds.y + 3, null);
-		// 게임 재시작버튼 위에서 해제 버튼 모양
-		else
-			g.drawImage(refresh, refreshBounds.x, refreshBounds.y, null);
 
 		// 게임 정지시
 		if (gamePaused) {
@@ -366,49 +324,15 @@ public class Board2_1p extends JPanel implements KeyListener, MouseListener, Mou
 
 	}
 
-	// 마우스 관련
-	@Override
-	public void mouseDragged(MouseEvent e) {
-		mouseX = e.getX();
-		mouseY = e.getY();
-	}
-
-	@Override
-	public void mouseMoved(MouseEvent e) {
-		mouseX = e.getX();
-		mouseY = e.getY();
-	}
-
-	@Override
-	public void mouseClicked(MouseEvent e) {
-
-	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-		if (e.getButton() == MouseEvent.BUTTON1)
-			leftClick = true;
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		if (e.getButton() == MouseEvent.BUTTON1)
-			leftClick = false;
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-	}
-
 	public void addScore(int line) {
 		score += line;
 	}
 
 	// 게터 세터 부분
+	public void setGamePause(boolean gamePaused) {
+		this.gamePaused = gamePaused;
+	}
+	
 	public boolean getGameOver() {
 		return gameOver;
 	}
