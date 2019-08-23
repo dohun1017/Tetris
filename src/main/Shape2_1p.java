@@ -5,7 +5,7 @@ import java.awt.image.BufferedImage;
 
 import javax.xml.ws.handler.MessageContext.Scope;
 
-public class Shape {
+public class Shape2_1p {
 
 	private int color;
 	private int x, y, moveWall;
@@ -16,7 +16,7 @@ public class Shape {
 	private int[][] coords;
 	private int[][] reference;
 	private int deltaX;
-	private Board board;
+	private Board2_1p board;
 
 	private int holdUse = 0;
 	private boolean moveX = false, moveY = false;
@@ -25,7 +25,7 @@ public class Shape {
 
 	private boolean QuickDown = false;
 
-	public Shape(int[][] coords, BufferedImage block, Board board, int color) {
+	public Shape2_1p(int[][] coords, BufferedImage block, Board2_1p board, int color) {
 		this.coords = coords;
 		this.block = block;
 		this.board = board;
