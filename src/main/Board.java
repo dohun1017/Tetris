@@ -134,7 +134,6 @@ public class Board extends JPanel implements KeyListener, MouseListener, MouseMo
 		if (backBounds.contains(mouseX - 222, mouseY) && leftClick) {
 			Window.whereBoard = 1;
 			Window.goTitle();
-			System.out.println("1p 고타이틀");
 			leftClick = !leftClick;
 			return;
 		}

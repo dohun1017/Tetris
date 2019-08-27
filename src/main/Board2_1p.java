@@ -22,7 +22,7 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-public class Board2_1p extends JPanel implements KeyListener{
+public class Board2_1p extends JPanel implements KeyListener {
 
 	private static final int TOTALROW = 22;
 	private static final long serialVersionUID = 1L;
@@ -37,10 +37,10 @@ public class Board2_1p extends JPanel implements KeyListener{
 	// 모든 도형
 	private Shape2_1p[] shapes = new Shape2_1p[7];
 	// 현재도형, 다음도형, 다다음도형, 홀드도형
-	private static Shape2_1p currentShape, nextShape, n_nextShape, holdShape;
+	private static Shape2_1p currentShape, nextShape, n_nextShape, holdShape, previewShape;
 	// 게임 루프
 	private Timer looper;
-	
+
 	public static boolean gameRefresh = false;
 	public static boolean gamePaused = false;
 	public static boolean gameOver = false;
@@ -53,6 +53,7 @@ public class Board2_1p extends JPanel implements KeyListener{
 	private int currentIndex;
 	// 다음 도형 인덱스
 	private int nextIndex[] = { (int) (Math.random() * shapes.length), (int) (Math.random() * shapes.length) };
+	private boolean Up, Down, Right, Left, Quick, Hold;
 
 	public Board2_1p() {
 		// 블록 불러오기
@@ -61,7 +62,7 @@ public class Board2_1p extends JPanel implements KeyListener{
 		setBackground(new Color(255, 255, 240));
 
 		// 게임 루퍼 생성
-		looper = new Timer(1000 / 240, new GameLooper());
+		looper = new Timer(0, new GameLooper());
 
 		// 도형들 생성
 		shapes[0] = new Shape2_1p(new int[][] { { 1, 1, 1, 1 } // I shape;
@@ -108,6 +109,8 @@ public class Board2_1p extends JPanel implements KeyListener{
 
 		// 현재도형 업데이트
 		currentShape.update();
+//		previewShape = currentShape;
+//		previewShape.previewBlock();
 	}
 
 	// 페인트 부분
@@ -123,6 +126,8 @@ public class Board2_1p extends JPanel implements KeyListener{
 				}
 			}
 		}
+		
+		
 		// 다음 도형 첫 번째 그리기
 		for (int row = 0; row < nextShape.getCoords().length; row++) {
 			for (int col = 0; col < nextShape.getCoords()[0].length; col++) {
@@ -150,8 +155,10 @@ public class Board2_1p extends JPanel implements KeyListener{
 			}
 
 		// 게임오버가 아닐 때 현재도형 그리기
-		if (!gameOver)
+		if (!gameOver) {
 			currentShape.render(g);
+			previewShape.render(g);
+		}
 
 		// 게임 정지시
 		if (gamePaused) {
@@ -228,6 +235,7 @@ public class Board2_1p extends JPanel implements KeyListener{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			moveShape();
 			update();
 			repaint();
 		}
@@ -240,6 +248,7 @@ public class Board2_1p extends JPanel implements KeyListener{
 	public void setCurrentShape() {
 		currentShape = nextShape;
 		currentIndex = nextIndex[0];
+		previewShape = currentShape;
 		setNextShape();
 		holdPossible = true;
 
@@ -293,30 +302,67 @@ public class Board2_1p extends JPanel implements KeyListener{
 		holdPossible = false;
 	}
 
-	// 키 눌렀을 때 이벤트들
+	public void moveShape() {
+		if (Up) {
+			currentShape.setDirection(1);
+			currentShape.rotateShape();
+			Up = false;
+		}
+		if (Right) {
+			currentShape.setDeltaX(1);
+			Right = false;
+		}
+		if (Left) {
+			currentShape.setDeltaX(-1);
+			Left = false;
+		}
+		if (Down)
+			currentShape.speedUp();
+		if (Hold)
+			holdShape();
+		if (Quick) {
+			currentShape.quickDown();
+			Quick = false;
+		}
+		if (!Down)
+			currentShape.speedDown();
+		else
+			return;
+	}
+
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_R) {
-			currentShape.setDirection(1);
-			currentShape.rotateShape();
+			Up = true;
 		}
 		if (e.getKeyCode() == KeyEvent.VK_G)
-			currentShape.setDeltaX(1);
+			Right = true;
 		if (e.getKeyCode() == KeyEvent.VK_D)
-			currentShape.setDeltaX(-1);
+			Left = true;
 		if (e.getKeyCode() == KeyEvent.VK_F)
-			currentShape.speedUp();
+			Down = true;
+		if (e.getKeyCode() == KeyEvent.VK_S)
+			Hold = true;
 		if (e.getKeyCode() == KeyEvent.VK_A)
-			holdShape();
-		if (e.getKeyCode() == KeyEvent.VK_SHIFT)
-			currentShape.quickDown();
+			Quick = true;
 	}
 
 	// 내려가는 키 뗄 때 원래의 속도
 	@Override
 	public void keyReleased(KeyEvent e) {
+		if (e.getKeyCode() == KeyEvent.VK_R) {
+			Up = false;
+		}
+		if (e.getKeyCode() == KeyEvent.VK_G)
+			Right = false;
+		if (e.getKeyCode() == KeyEvent.VK_D)
+			Left = false;
 		if (e.getKeyCode() == KeyEvent.VK_F)
-			currentShape.speedDown();
+			Down = false;
+		if (e.getKeyCode() == KeyEvent.VK_S)
+			Hold = false;
+		if (e.getKeyCode() == KeyEvent.VK_A)
+			Quick = false;
 	}
 
 	@Override
@@ -332,7 +378,7 @@ public class Board2_1p extends JPanel implements KeyListener{
 	public void setGamePause(boolean gamePaused) {
 		this.gamePaused = gamePaused;
 	}
-	
+
 	public boolean getGameOver() {
 		return gameOver;
 	}

@@ -10,7 +10,7 @@ public class Shape2_2p {
 	private int color;
 	private int x, y, moveWall;
 	private long time, lastTime;
-	private int normal = 600, fast = 50;
+	private int normal = 699, fast = 97;
 	private int delay;
 	private BufferedImage block;
 	private int[][] coords;
@@ -35,10 +35,10 @@ public class Shape2_2p {
 		y = 0;
 
 		// 속도 난이도 변경
-		if (this.board.getScore() >= 110)
-			normal = 70;
+		if (this.board.getScore() >= 70)
+			normal = 97;
 		else
-			normal -= (this.board.getScore() / 10) * 50;
+			normal -= (this.board.getScore() / 10) * 97;
 		delay = normal;
 
 		time = 0;

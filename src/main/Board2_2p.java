@@ -63,6 +63,7 @@ public class Board2_2p extends JPanel implements KeyListener, MouseListener, Mou
 	private int currentIndex;
 	// 다음 도형 인덱스
 	private int nextIndex[] = { (int) (Math.random() * shapes.length), (int) (Math.random() * shapes.length) };
+	private boolean Up, Down, Right, Left, Quick, Hold;
 
 	public Board2_2p() {
 		// 블록 불러오기
@@ -85,7 +86,7 @@ public class Board2_2p extends JPanel implements KeyListener, MouseListener, Mou
 		backBounds = new Rectangle(350, 500 + back.getHeight() + 20, back.getWidth(),
 				back.getHeight() + back.getHeight() / 2);
 		// 게임 루퍼 생성
-		looper = new Timer(1000 / 240, new GameLooper());
+		looper = new Timer(0, new GameLooper());
 
 		// 도형들 생성
 		shapes[0] = new Shape2_2p(new int[][] { { 1, 1, 1, 1 } // I shape;
@@ -140,7 +141,7 @@ public class Board2_2p extends JPanel implements KeyListener, MouseListener, Mou
 			Window.goTitle();
 			return;
 		}
-		
+
 		// 게임정지, 게임오버 (아무것도 안할 때)
 		if (gamePaused || gameOver) {
 			return;
@@ -294,6 +295,7 @@ public class Board2_2p extends JPanel implements KeyListener, MouseListener, Mou
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			moveShape();
 			update();
 			repaint();
 		}
@@ -360,29 +362,62 @@ public class Board2_2p extends JPanel implements KeyListener, MouseListener, Mou
 	}
 
 	// 키 눌렀을 때 이벤트들
-	@Override
-	public void keyPressed(KeyEvent e) {
-		if (e.getKeyCode() == KeyEvent.VK_UP) {
+	public void moveShape() {
+		if (Up) {
 			currentShape.setDirection(1);
 			currentShape.rotateShape();
+			Up = false;
+		}
+		if (Right)
+			currentShape.setDeltaX(1);
+		if (Left)
+			currentShape.setDeltaX(-1);
+		if (Down)
+			currentShape.speedUp();
+		if (Hold)
+			holdShape();
+		if (Quick) {
+			currentShape.quickDown();
+			Quick = false;
+		}
+		if (!Down)
+			currentShape.speedDown();
+		else
+			return;
+	}
+
+	public void keyPressed(KeyEvent e) {
+		if (e.getKeyCode() == KeyEvent.VK_UP) {
+			Up = true;
 		}
 		if (e.getKeyCode() == KeyEvent.VK_RIGHT)
-			currentShape.setDeltaX(1);
+			Right = true;
 		if (e.getKeyCode() == KeyEvent.VK_LEFT)
-			currentShape.setDeltaX(-1);
+			Left = true;
 		if (e.getKeyCode() == KeyEvent.VK_DOWN)
-			currentShape.speedUp();
+			Down = true;
 		if (e.getKeyCode() == KeyEvent.VK_L)
-			holdShape();
-		if (e.getKeyCode() == KeyEvent.VK_M)
-			currentShape.quickDown();
+			Hold = true;
+		if (e.getKeyCode() == KeyEvent.VK_K)
+			Quick = true;
 	}
 
 	// 내려가는 키 뗄 때 원래의 속도
 	@Override
 	public void keyReleased(KeyEvent e) {
+		if (e.getKeyCode() == KeyEvent.VK_UP) {
+			Up = false;
+		}
+		if (e.getKeyCode() == KeyEvent.VK_RIGHT)
+			Right = false;
+		if (e.getKeyCode() == KeyEvent.VK_LEFT)
+			Left = false;
 		if (e.getKeyCode() == KeyEvent.VK_DOWN)
-			currentShape.speedDown();
+			Down = false;
+		if (e.getKeyCode() == KeyEvent.VK_L)
+			Hold = false;
+		if (e.getKeyCode() == KeyEvent.VK_K)
+			Quick = false;
 	}
 
 	@Override
@@ -436,7 +471,7 @@ public class Board2_2p extends JPanel implements KeyListener, MouseListener, Mou
 	public void setGamePause(boolean gamePaused) {
 		this.gamePaused = gamePaused;
 	}
-	
+
 	public boolean getGameOver() {
 		return gameOver;
 	}

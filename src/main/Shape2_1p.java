@@ -261,6 +261,17 @@ public class Shape2_1p {
 		land = true;
 		drawBlock();
 	}
+	public void previewBlock() {
+		if (board.getGameOver() || board.getGamePause())
+			return;
+		while (true) {
+			checkY();
+			if (moveY)
+				y++;
+			else
+				break;
+		}
+	}
 
 	// 각종 게터, 세터
 	public int getColor() {
