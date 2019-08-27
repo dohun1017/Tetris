@@ -199,6 +199,18 @@ public class Shape2_1p {
 				x--;
 				moveWall++;
 			}
+			for (int row = 0; row < rotatedShape.length; row++) {
+				for (int col = 0; col < rotatedShape[row].length; col++) {
+					if (rotatedShape[row][col] != 0) {
+						if (board.getBoard()[y + row][x + col] != 0) {
+							x+=moveWall;
+							moveWall = 0;
+							reachWall = false;
+							return;
+						}
+					}
+				}
+			}
 		} else {
 			if (reachWall) {
 				x+=moveWall;
@@ -217,7 +229,6 @@ public class Shape2_1p {
 		}
 		coords = rotatedShape;
 	}
-
 	// 도형 배열 왼쪽 회전
 	private int[][] transposeMatrixLeft(int[][] matrix) {
 		int[][] temp = new int[matrix[0].length][matrix.length];
@@ -260,17 +271,6 @@ public class Shape2_1p {
 		QuickDown = true;
 		land = true;
 		drawBlock();
-	}
-	public void previewBlock() {
-		if (board.getGameOver() || board.getGamePause())
-			return;
-		while (true) {
-			checkY();
-			if (moveY)
-				y++;
-			else
-				break;
-		}
 	}
 
 	// 각종 게터, 세터

@@ -37,7 +37,7 @@ public class Board2_1p extends JPanel implements KeyListener {
 	// 모든 도형
 	private Shape2_1p[] shapes = new Shape2_1p[7];
 	// 현재도형, 다음도형, 다다음도형, 홀드도형
-	private static Shape2_1p currentShape, nextShape, n_nextShape, holdShape, previewShape;
+	private static Shape2_1p currentShape, nextShape, n_nextShape, holdShape;
 	// 게임 루프
 	private Timer looper;
 
@@ -109,8 +109,6 @@ public class Board2_1p extends JPanel implements KeyListener {
 
 		// 현재도형 업데이트
 		currentShape.update();
-//		previewShape = currentShape;
-//		previewShape.previewBlock();
 	}
 
 	// 페인트 부분
@@ -157,7 +155,6 @@ public class Board2_1p extends JPanel implements KeyListener {
 		// 게임오버가 아닐 때 현재도형 그리기
 		if (!gameOver) {
 			currentShape.render(g);
-			previewShape.render(g);
 		}
 
 		// 게임 정지시
@@ -248,7 +245,6 @@ public class Board2_1p extends JPanel implements KeyListener {
 	public void setCurrentShape() {
 		currentShape = nextShape;
 		currentIndex = nextIndex[0];
-		previewShape = currentShape;
 		setNextShape();
 		holdPossible = true;
 

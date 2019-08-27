@@ -199,6 +199,18 @@ public class Shape2_2p {
 				x--;
 				moveWall++;
 			}
+			for (int row = 0; row < rotatedShape.length; row++) {
+				for (int col = 0; col < rotatedShape[row].length; col++) {
+					if (rotatedShape[row][col] != 0) {
+						if (board.getBoard()[y + row][x + col] != 0) {
+							x+=moveWall;
+							moveWall = 0;
+							reachWall = false;
+							return;
+						}
+					}
+				}
+			}
 		} else {
 			if (reachWall) {
 				x+=moveWall;
