@@ -31,11 +31,6 @@ public class Window {
 		
 		window.setVisible(true);
 	}
-	class MyRunnable implements Runnable{
-		public void run() {
-			
-		}
-	}
 
 	public void startTetris() {
 		window.remove(title);

@@ -62,7 +62,7 @@ public class Board2_1p extends JPanel implements KeyListener {
 		setBackground(new Color(255, 255, 240));
 
 		// 게임 루퍼 생성
-		looper = new Timer(0, new GameLooper());
+		looper = new Timer(90, new GameLooper());
 
 		// 도형들 생성
 		shapes[0] = new Shape2_1p(new int[][] { { 1, 1, 1, 1 } // I shape;
@@ -304,23 +304,23 @@ public class Board2_1p extends JPanel implements KeyListener {
 			currentShape.rotateShape();
 			Up = false;
 		}
-		if (Right) {
+		else if (Right) {
 			currentShape.setDeltaX(1);
 			Right = false;
 		}
-		if (Left) {
+		else if (Left) {
 			currentShape.setDeltaX(-1);
 			Left = false;
 		}
-		if (Down)
+		else if (Down)
 			currentShape.speedUp();
-		if (Hold)
+		else if (Hold)
 			holdShape();
-		if (Quick) {
+		else if (Quick) {
 			currentShape.quickDown();
 			Quick = false;
 		}
-		if (!Down)
+		else if (!Down)
 			currentShape.speedDown();
 		else
 			return;

@@ -86,7 +86,7 @@ public class Board2_2p extends JPanel implements KeyListener, MouseListener, Mou
 		backBounds = new Rectangle(350, 500 + back.getHeight() + 20, back.getWidth(),
 				back.getHeight() + back.getHeight() / 2);
 		// 게임 루퍼 생성
-		looper = new Timer(0, new GameLooper());
+		looper = new Timer(90, new GameLooper());
 
 		// 도형들 생성
 		shapes[0] = new Shape2_2p(new int[][] { { 1, 1, 1, 1 } // I shape;
